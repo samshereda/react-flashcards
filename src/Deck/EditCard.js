@@ -1,8 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useHistory, useParams} from 'react-router-dom';
-import {readDeck, readCard, updateCard} from "../utils/api/index";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import { readDeck, readCard, updateCard } from "../utils/api/index";
+import CardForm from "./CardForm";
 
-function DeckEdit ({deckId}) {
+//Component to wrap the CardForm component when editing cards
+function EditCard({ deckId }) {
   const cardId = useParams().cardId;
   const [deck, setDeck] = useState({});
   const [card, setCard] = useState({});
@@ -10,10 +12,10 @@ function DeckEdit ({deckId}) {
 
   useEffect(() => {
     setDeck({});
-    setCard({})
-    
-    const abortController = new AbortController(); 
-  
+    setCard({});
+
+    const abortController = new AbortController();
+
     async function loadDeck() {
       try {
         const deckFromAPI = await readDeck(deckId, abortController.signal);
@@ -30,7 +32,7 @@ function DeckEdit ({deckId}) {
     async function loadCard() {
       try {
         const cardFromAPI = await readCard(cardId, abortController.signal);
-        setCard(cardFromAPI);
+        setCard({ ...cardFromAPI });
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("Aborted");
@@ -39,24 +41,20 @@ function DeckEdit ({deckId}) {
         }
       }
     }
-    
-    loadDeck()
-    loadCard()
-  }, [])
 
-  const handleChange = ({ target }) => {
-    setCard({
-      ...card,
-      [target.name]: target.value,
-    });
-  };
+    loadDeck();
+    loadCard();
+  }, [cardId, deckId]);
+
+  console.log(card, 1);
 
   const handleSubmit = (event) => {
-    const abortController = new AbortController(); 
+    const abortController = new AbortController();
     event.preventDefault();
     try {
       updateCard(card, abortController.signal);
       history.push(`/decks/${deckId}`);
+      history.go(0);
     } catch (error) {
       if (error.name === "AbortError") {
         console.log("Aborted");
@@ -66,28 +64,17 @@ function DeckEdit ({deckId}) {
     }
   };
 
-  return (<>
-    <nav aria-label="breadcrumb">
-      <ol className="breadcrumb">
-        <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-        <li className="breadcrumb-item"><Link to={`/decks/${deck.id}`}>{deck.name}</Link></li>
-        <li className="breadcrumb-item active" aria-current="page">Edit Card {card.id}</li>
-      </ol>
-    </nav>
-    <h3>{deck.name}: Edit Card</h3>
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="front">Front</label>
-      <br />
-      <textarea id="front" name="front" value={card.front} onChange={handleChange}></textarea>
-      <br />
-      <label htmlFor="back">Back</label>
-      <br />
-      <textarea id="back" name="back" value={card.back} onChange={handleChange}></textarea>
-      <br/>
-      <Link to={`/decks/${deckId}`} className="btn btn-secondary">Cancel</Link>
-      <button type="submit" className="btn btn-primary">Save</button>
-    </form>
-  </>)
+  if (!card.front) return <>Loading</>;
+
+  return (
+    <CardForm
+      editing={true}
+      deck={deck}
+      card={card}
+      setCard={setCard}
+      handleSubmit={handleSubmit}
+    />
+  );
 }
 
-export default DeckEdit
+export default EditCard;

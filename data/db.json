@@ -19,8 +19,8 @@
   "cards": [
     {
       "id": 2,
-      "front": "How do you modify the state of a different React component?",
-      "back": "Not at all! State is visible to the component only.",
+      "front": "How do you modify the state of a diff hello component?",
+      "back": "Not at all! State is visible to the component only. update",
       "deckId": 1
     },
     {
@@ -58,6 +58,24 @@
       "back": "back",
       "deckId": 1,
       "id": 8
+    },
+    {
+      "front": "Test front",
+      "back": "Test back",
+      "deckId": 1,
+      "id": 9
+    },
+    {
+      "front": "test card front",
+      "back": "test card back",
+      "deckId": 1,
+      "id": 10
+    },
+    {
+      "front": "front",
+      "back": "back",
+      "deckId": 1,
+      "id": 11
     }
   ]
 }
